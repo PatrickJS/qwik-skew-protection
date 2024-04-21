@@ -1,7 +1,20 @@
-import { component$ } from "@builder.io/qwik";
-import type { DocumentHead } from "@builder.io/qwik-city";
+import { $, component$, useSignal, useTask$ } from "@builder.io/qwik";
+import { server$, type DocumentHead } from "@builder.io/qwik-city";
+
+export const useServerData = server$(function () {
+  console.log("server data", this.cookie.get("__vdpl")!.value);
+  return {
+    name: "Qwik",
+  };
+});
 
 export default component$(() => {
+  const data = useSignal();
+  useTask$(async () => {
+    const res = await useServerData();
+    console.log("task", res);
+    data.value = res;
+  });
   return (
     <>
       <h1>Hi 👋</h1>
@@ -9,6 +22,17 @@ export default component$(() => {
         Can't wait to see what you build with qwik!
         <br />
         Happy coding.
+        <button
+          onClick$={[
+            $(async () => {
+              const res = await useServerData();
+              console.log("task", res);
+              data.value = res;
+            }),
+          ]}
+        >
+          Click me
+        </button>
       </p>
     </>
   );
