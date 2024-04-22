@@ -1,17 +1,17 @@
 import { $, component$, useSignal, useTask$ } from "@builder.io/qwik";
 import { server$, type DocumentHead } from "@builder.io/qwik-city";
 
-export const useServerData = server$(function () {
-  console.log("server data", this.cookie.get("__vdpl")!.value);
+export const getServerData = server$(function () {
+  console.log("server data", this.cookie?.get("__vdpl")?.value);
   return {
     name: "Qwik",
   };
 });
 
 export default component$(() => {
-  const data = useSignal();
+  const data = useSignal<any>();
   useTask$(async () => {
-    const res = await useServerData();
+    const res = await getServerData();
     console.log("task", res);
     data.value = res;
   });
@@ -25,7 +25,7 @@ export default component$(() => {
         <button
           onClick$={[
             $(async () => {
-              const res = await useServerData();
+              const res = await getServerData();
               console.log("task", res);
               data.value = res;
             }),

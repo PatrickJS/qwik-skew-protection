@@ -1,7 +1,20 @@
-import { component$, Slot } from "@builder.io/qwik";
+import { component$, h, Slot } from "@builder.io/qwik";
 import type { RequestHandler } from "@builder.io/qwik-city";
 
 export const onGet: RequestHandler = async (resEv) => {
+  // const headers: any = [];
+  // resEv.request.headers.forEach((value, key) => {
+  //   headers.push({ key, value });
+  // });
+  // console.log("resEv.headers", headers);
+  // console.log(
+  //   "process.env.VERCEL_SKEW_PROTECTION_ENABLED",
+  //   process.env.VERCEL_SKEW_PROTECTION_ENABLED
+  // );
+  // console.log(
+  //   "process.env.VERCEL_DEPLOYMENT_ID",
+  //   process.env.VERCEL_DEPLOYMENT_ID
+  // );
   // Control caching for this request for best performance and to reduce hosting costs:
   // https://qwik.dev/docs/caching/
   resEv.cacheControl({
@@ -14,10 +27,13 @@ export const onGet: RequestHandler = async (resEv) => {
 
 export const onRequest: RequestHandler = async (resEv) => {
   if (process.env.VERCEL_SKEW_PROTECTION_ENABLED) {
-    resEv.headers.set(
-      "SET-COOKIE",
-      `__vdpl=${process.env.VERCEL_DEPLOYMENT_ID}; Path=${resEv.basePathname || "/"}; SameSite=Strict; Secure; HttpOnly`
-    );
+    if (resEv.request.headers.has("Sec-Fetch-Dest")) {
+      console.log("Sec-Fetch-Dest", resEv.headers.get("Sec-Fetch-Dest"));
+      resEv.headers.set(
+        "SET-COOKIE",
+        `__vdpl=${process.env.VERCEL_DEPLOYMENT_ID}; Path=${resEv.basePathname || "/"}; SameSite=Strict; Secure; HttpOnly`
+      );
+    }
   }
 };
 
